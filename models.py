@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.special import expit  # sigmoid
+from scipy.special import expit, logsumexp # sigmoid
 from polyagamma import random_polyagamma
 
 
@@ -84,10 +84,12 @@ class GibbsSamplerLLFM:
         self.burn = burn
         self.n_subsample = n_subsample
 
-        self.samples_W = []
-        self.samples_b = []
-        self.samples_Z = []
-        self.feature_counter = 0
+        self.samples_W = np.empty((self.n_iter, self.K, self.S))
+        self.samples_b = np.empty((self.n_iter, self.S))
+        self.samples_Z = np.empty((self.n_iter, self.T, self.K))
+        self.good_samples_W = np.empty((self.n_subsample, self.K, self.S)) 
+        self.good_samples_b = np.empty((self.n_subsample, self.S))
+        self.good_samples_Z = np.empty((self.n_subsample, self.T, self.K))
 
     # --------------------------------------------------------
     # Main Gibbs loop
@@ -212,13 +214,10 @@ class GibbsSamplerLLFM:
             # Store samples
             # -------------------------------------------------
 
-            self.samples_W.append(self.model.W.copy())
-            self.samples_b.append(self.model.b.copy())
-            self.samples_Z.append(self.model.Z.copy())
+            self.samples_W[it] = self.model.W
+            self.samples_b[it] = self.model.b
+            self.samples_Z[it] = self.model.Z
 
-            self.feature_counter += (self.model.Z.sum(axis=0) > 0).sum()
-        self.feature_counter /= self.n_iter  # Average number of active features across iterations
-        print(f"Average number of active features across iterations: {self.feature_counter:.2f}")
 
     def get_posterior_samples(self):
         burn = self.burn
@@ -232,94 +231,64 @@ class GibbsSamplerLLFM:
         else:
             chosen = np.random.choice(valid_idx, size=n_subsample, replace=False)
 
-        samples_W = [self.samples_W[i] for i in chosen]
-        samples_b = [self.samples_b[i] for i in chosen]
-        samples_Z = [self.samples_Z[i] for i in chosen]
-        return samples_W, samples_b, samples_Z
+        self.good_samples_W = self.samples_W[chosen]
+        self.good_samples_b = self.samples_b[chosen]
+        self.good_samples_Z = self.samples_Z[chosen]
+        return self.good_samples_W, self.good_samples_b, self.good_samples_Z
+    
+
+    def posterior_predictive(self, cond_obs, n_z_samples=50):
+        """
+        Predict P(Y_last | Y_0:S-2 = cond_obs, data)
+        cond_obs: array of shape (S-1,), binary assignment of observed features
+        """
+        samples_W = self.good_samples_W   # (N, K, S)
+        samples_b = self.good_samples_b   # (N, S)
+        samples_Z = self.good_samples_Z   # (N, T, K)
+        cond_obs = np.array(cond_obs)     # (S-1,)
+        N, K, S = samples_W.shape
+
+        # Check cond_obs length
+        assert len(cond_obs) == S-1, "cond_obs must have length S-1"
+
+        # ----- Repeat latent draws -----
+        Z_train_counts = samples_Z.sum(axis=1)  # (N, K)
+        prior_prob = Z_train_counts / self.T
+        Z_new = np.random.binomial(1, prior_prob[:, None, :], size=(N, n_z_samples, K))  # (N, n_z_samples, K)
+
+        # ----- Expand W and b -----
+        W_expand = samples_W[:, None, :, :]        # (N,1,K,S)
+        W_expand = np.repeat(W_expand, n_z_samples, axis=1)
+        b_expand = samples_b[:, None, :]           # (N,1,S)
+        b_expand = np.repeat(b_expand, n_z_samples, axis=1)
+
+        # ----- Build full observation vector: conditioned + prediction -----
+        obs = np.concatenate([cond_obs, [1]])      # predict "1" for last index
+        indices = list(range(S))                    # all dimensions
+
+        # ----- Compute eta for all relevant dims -----
+        eta_all = np.einsum('nzk,nzks->nzs', Z_new, W_expand[:, :, :, indices]) + b_expand[:, :, indices]  # (N, n_z_samples, S)
+
+        obs_expand = obs[None, None, :]  # (1,1,S)
+        logp_all = obs_expand * np.log(expit(eta_all)+1e-12) + (1-obs_expand) * np.log(1-expit(eta_all)+1e-12)
+        logp_all = np.sum(logp_all, axis=2)  # sum over dimensions -> (N, n_z_samples)
+
+        # ----- Marginal for conditioned dims only -----
+        eta_cond = eta_all[:, :, :S-1]
+        obs_cond = cond_obs[None, None, :]     # (1,1,S-1)
+        logp_cond = obs_cond * np.log(expit(eta_cond)+1e-12) + (1-obs_cond) * np.log(1-expit(eta_cond)+1e-12)
+        logp_cond = np.sum(logp_cond, axis=2)  # (N, n_z_samples)
+
+        # ----- Monte Carlo estimate -----
+        log_num = logsumexp(logp_all, axis=1) - np.log(n_z_samples)
+        log_den = logsumexp(logp_cond, axis=1) - np.log(n_z_samples)
+
+        log_num_avg = logsumexp(log_num) - np.log(N)
+        log_den_avg = logsumexp(log_den) - np.log(N)
+
+        p_post = np.exp(log_num_avg - log_den_avg)
+        return p_post
 
 
 
-    def posterior_predictive(self, burn=0, nsamples=None,
-                         conds=[1,0,0], predindex=3,
-                         n_cond_gibbs=5):
-
-        samples_W, samples_b, samples_Z = self.get_posterior_samples(
-            burn=burn, n_subsample=nsamples
-        )
-
-        probs = []
-        S_cond = len(conds)
-
-        for it in range(len(samples_W)):
-
-            W = samples_W[it]
-            b = samples_b[it]
-            Z = samples_Z[it]
-
-            # ---- Predictive prior for Z_new ----
-            m_k = Z.sum(axis=0)
-            prior_prob = (m_k + self.alpha / self.K) / (
-                self.T + self.alpha / self.K + 1
-            )
-
-            # ---- Initialize Z_new ----
-            Z_new = np.random.binomial(1, prior_prob)
-
-            # ---- Compute eta for conditioned dims ONCE ----
-            W_cond = W[:, :S_cond]
-            b_cond = b[:S_cond]
-
-            eta = Z_new @ W_cond + b_cond  # shape (S_cond,)
-
-            # ---- Gibbs sweeps ----
-            for sweep in range(n_cond_gibbs):
-
-                for k in range(self.K):
-
-                    z_old = Z_new[k]
-
-                    # Remove old contribution if active
-                    if z_old == 1:
-                        eta_minus = eta - W_cond[k]
-                    else:
-                        eta_minus = eta
-
-                    # ----- z = 0 -----
-                    ll0 = np.sum(
-                        np.array(conds) * np.log(expit(eta_minus) + 1e-12) +
-                        (1 - np.array(conds)) * np.log(1 - expit(eta_minus) + 1e-12)
-                    )
-
-                    # ----- z = 1 -----
-                    eta_plus = eta_minus + W_cond[k]
-                    ll1 = np.sum(
-                        np.array(conds) * np.log(expit(eta_plus) + 1e-12) +
-                        (1 - np.array(conds)) * np.log(1 - expit(eta_plus) + 1e-12)
-                    )
-
-                    # Prior
-                    log_prior_1 = np.log(prior_prob[k] + 1e-12)
-                    log_prior_0 = np.log(1 - prior_prob[k] + 1e-12)
-
-                    logp1 = ll1 + log_prior_1
-                    logp0 = ll0 + log_prior_0
-
-                    p = 1.0 / (1.0 + np.exp(-(logp1 - logp0)))
-
-                    z_new = np.random.binomial(1, p)
-                    Z_new[k] = z_new
-
-                    # Update eta incrementally
-                    if z_new != z_old:
-                        eta = eta_minus + z_new * W_cond[k]
-
-            # ---- Predictive probability ----
-            eta_pred = Z_new @ W[:, predindex] + b[predindex]
-            p_pred = expit(eta_pred)
-
-            probs.append(p_pred)
-
-        return np.mean(probs)
-
-
-
+    
