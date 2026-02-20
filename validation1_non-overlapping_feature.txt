@@ -1,0 +1,53 @@
+============================================================
+TRUE SYNTHETIC PARAMETERS
+============================================================
+
+T (observations): 150
+S (dimensions):   4
+K_true (features): 2
+
+True latent feature usage counts:
+  Feature 0: active 70.0 times
+  Feature 1: active 40.0 times
+
+True weight matrix W_true (K x S):
+[[0. 6. 6. 0.]
+ [6. 0. 0. 6.]]
+
+True bias vector b_true:
+[-3 -3 -3 -3]
+
+Observed data summary (Y):
+  Mean activation per dimension: [0.30666667 0.44666667 0.46       0.29333333]
+  Overall mean activation: 0.3767
+
+============================================================
+
+
+============================================================
+Posterior grouping by number of active features
+
+Number of samples with zero active features: 0/500
+Average active features per sample: 2.224
+
+Group with 2 active features:
+  Number of posterior samples: 388/500
+ Average usage of features (size-biased order):
+[93.6 80.1]
+  Average weights:
+[[-7.67   3.324  3.748 -9.431]
+ [ 3.278 -5.069 -5.393  3.279]]
+  Average Bias:
+[-0.011  0.062  0.119 -0.137]
+----------------------------------------
+Group with 3 active features:
+  Number of posterior samples: 112/500
+ Average usage of features (size-biased order):
+[94.4 86.6 35.3]
+  Average weights:
+[[-7.768  2.228  2.534 -8.849]
+ [ 2.105 -4.74  -4.9    2.664]
+ [ 0.925  3.703  3.608 -1.193]]
+  Average Bias:
+[-0.047 -0.     0.036 -0.114]
+----------------------------------------

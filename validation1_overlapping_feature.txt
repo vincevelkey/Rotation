@@ -1,0 +1,68 @@
+============================================================
+TRUE SYNTHETIC PARAMETERS
+============================================================
+
+T (observations): 150
+S (dimensions):   4
+K_true (features): 2
+
+True latent feature usage counts:
+  Feature 0: active 75.0 times
+  Feature 1: active 65.0 times
+
+True weight matrix W_true (K x S):
+[[0. 6. 6. 0.]
+ [6. 0. 0. 6.]]
+
+True bias vector b_true:
+[-3 -3 -3 -3]
+
+Observed data summary (Y):
+  Mean activation per dimension: [0.45333333 0.53333333 0.46666667 0.44      ]
+  Overall mean activation: 0.4733
+
+============================================================
+
+
+============================================================
+Posterior grouping by number of active features
+
+Number of samples with zero active features: 0/500
+Average active features per sample: 3.074
+
+Group with 3 active features:
+  Number of posterior samples: 466/500
+ Average usage of features (size-biased order):
+[111.7  74.1  52.3]
+  Average weights:
+[[-3.187  3.565  2.951 -3.648]
+ [ 4.287 -2.281 -2.796  4.088]
+ [-1.471 -4.348 -4.762 -1.06 ]]
+  Average Bias:
+[-0.075 -0.048 -0.083 -0.078]
+----------------------------------------
+Group with 4 active features:
+  Number of posterior samples: 31/500
+ Average usage of features (size-biased order):
+[101.9  72.5  47.5  12. ]
+  Average weights:
+[[-3.111  3.349  3.457 -3.914]
+ [ 3.328 -2.75  -3.509  3.751]
+ [-1.093 -3.042 -6.073 -1.577]
+ [-0.483  2.138  1.429  0.678]]
+  Average Bias:
+[-0.07  -0.082 -0.123 -0.075]
+----------------------------------------
+Group with 5 active features:
+  Number of posterior samples: 3/500
+ Average usage of features (size-biased order):
+[115.3  81.   34.7  20.7  10.3]
+  Average weights:
+[[-4.174  3.583  3.077 -4.427]
+ [ 6.246 -2.782 -3.532  6.252]
+ [-2.816 -1.976 -4.952 -4.08 ]
+ [-1.148  0.086 -0.934 -1.6  ]
+ [-1.588 -4.393 -3.131  2.001]]
+  Average Bias:
+[-0.169 -0.076  0.256  0.002]
+----------------------------------------
