@@ -1,0 +1,636 @@
+
+============================================================
+Number of A-X pairs: 0.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 4
+Number of posterior samples in this group: 327/1000
+
+Average weights (dominant group):
+[[ 0.451 -7.688 -0.87   2.177]
+ [ 1.858 -7.123 -2.645  1.585]
+ [ 1.117 -5.464 -1.617  1.243]
+ [ 0.205 -2.441 -0.142  0.486]]
+Average Bias (dominant group):
+[-0.208 -1.56  -0.216 -0.126]
+
+============================================================
+Number of A-X pairs: 2.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 365/1000
+
+Average weights (dominant group):
+[[ 2.517 -7.059 -3.937  2.757]
+ [ 0.807 -5.918 -1.494  2.226]
+ [ 0.424 -2.105 -0.607  0.864]]
+Average Bias (dominant group):
+[-0.166 -0.983 -0.329 -0.078]
+
+============================================================
+Number of A-X pairs: 4.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 4
+Number of posterior samples in this group: 295/1000
+
+Average weights (dominant group):
+[[ 2.475 -5.34  -3.815  2.695]
+ [ 0.904 -4.021 -1.499  1.991]
+ [ 0.89  -1.485 -1.304  0.862]
+ [ 0.464 -0.539 -0.543  0.2  ]]
+Average Bias (dominant group):
+[-0.116 -0.565 -0.316 -0.094]
+
+============================================================
+Number of A-X pairs: 6.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 4
+Number of posterior samples in this group: 334/1000
+
+Average weights (dominant group):
+[[ 2.435 -4.175 -3.735  2.548]
+ [ 1.044 -2.934 -2.007  1.694]
+ [ 0.805 -1.538 -1.176  0.873]
+ [ 0.37  -0.369 -0.225  0.336]]
+Average Bias (dominant group):
+[-0.112 -0.401 -0.349 -0.13 ]
+
+============================================================
+Number of A-X pairs: 8.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 450/1000
+
+Average weights (dominant group):
+[[ 1.465 -3.481 -2.188  2.4  ]
+ [ 1.996 -1.902 -3.051  0.959]
+ [ 0.045 -0.73  -0.136  0.573]]
+Average Bias (dominant group):
+[-0.161 -0.26  -0.219 -0.18 ]
+
+============================================================
+Number of A-X pairs: 10.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 472/1000
+
+Average weights (dominant group):
+[[ 1.662 -2.913 -2.535  1.993]
+ [ 1.685 -2.214 -2.596  1.384]
+ [ 0.46  -0.149 -0.528  0.254]]
+Average Bias (dominant group):
+[-0.161 -0.262 -0.238 -0.189]
+
+============================================================
+Number of A-X pairs: 12.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 375/1000
+
+Average weights (dominant group):
+[[ 2.556 -1.195 -3.73   0.696]
+ [ 0.605 -3.678 -1.365  2.513]
+ [ 0.431 -0.24  -0.431  0.241]]
+Average Bias (dominant group):
+[-0.151 -0.199 -0.223 -0.164]
+
+============================================================
+Number of A-X pairs: 14.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 361/1000
+
+Average weights (dominant group):
+[[ 3.202 -0.494 -4.53   0.145]
+ [ 0.143 -4.153 -0.717  3.159]
+ [ 0.442  0.006 -0.457  0.058]]
+Average Bias (dominant group):
+[-0.172 -0.22  -0.217 -0.173]
+
+============================================================
+Number of A-X pairs: 16.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 440/1000
+
+Average weights (dominant group):
+[[ 3.681  0.443 -5.224 -0.769]
+ [-0.238 -5.11  -0.106  3.893]
+ [ 0.164 -0.229 -0.338  0.127]]
+Average Bias (dominant group):
+[-0.175 -0.19  -0.225 -0.172]
+
+============================================================
+Number of A-X pairs: 18.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 360/1000
+
+Average weights (dominant group):
+[[ 3.332  0.289 -4.738 -0.622]
+ [-0.015 -4.735 -0.406  3.705]
+ [ 0.591 -0.113 -0.638  0.162]]
+Average Bias (dominant group):
+[-0.19  -0.144 -0.204 -0.185]
+
+============================================================
+Number of A-X pairs: 20.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 2
+Number of posterior samples in this group: 354/1000
+
+Average weights (dominant group):
+[[ 4.001  1.26  -5.698 -1.471]
+ [-0.582 -5.593  0.349  4.677]]
+Average Bias (dominant group):
+[-0.121 -0.187 -0.217 -0.177]
+
+============================================================
+Number of A-X pairs: 25.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 2
+Number of posterior samples in this group: 402/1000
+
+Average weights (dominant group):
+[[ 4.14   1.561 -5.737 -1.824]
+ [-0.741 -5.988  0.529  4.888]]
+Average Bias (dominant group):
+[-0.137 -0.154 -0.237 -0.169]
+
+============================================================
+Number of A-X pairs: 30.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 405/1000
+
+Average weights (dominant group):
+[[ 3.986  1.636 -5.818 -1.851]
+ [-0.502 -5.265  0.244  4.544]
+ [ 0.221 -0.436 -0.29   0.456]]
+Average Bias (dominant group):
+[-0.163 -0.12  -0.248 -0.173]
+
+============================================================
+Number of A-X pairs: 35.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 455/1000
+
+Average weights (dominant group):
+[[ 3.911  1.781 -5.531 -2.048]
+ [-0.282 -5.424  0.031  4.694]
+ [ 0.153 -0.557 -0.257  0.566]]
+Average Bias (dominant group):
+[-0.151 -0.133 -0.206 -0.174]
+
+============================================================
+Number of A-X pairs: 40.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 2
+Number of posterior samples in this group: 422/1000
+
+Average weights (dominant group):
+[[ 4.131  2.003 -6.426 -2.334]
+ [-0.69  -6.171  0.492  5.343]]
+Average Bias (dominant group):
+[-0.14  -0.114 -0.232 -0.205]
+
+============================================================
+Number of A-X pairs: 45.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 2
+Number of posterior samples in this group: 374/1000
+
+Average weights (dominant group):
+[[ 4.259  2.171 -6.314 -2.424]
+ [-0.797 -6.058  0.568  5.493]]
+Average Bias (dominant group):
+[-0.139 -0.101 -0.218 -0.166]
+
+============================================================
+Number of A-X pairs: 50.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 2
+Number of posterior samples in this group: 503/1000
+
+Average weights (dominant group):
+[[ 4.116  2.28  -6.744 -2.507]
+ [-0.707 -6.283  0.547  5.564]]
+Average Bias (dominant group):
+[-0.145 -0.112 -0.244 -0.159]
+
+============================================================
+Number of A-X pairs: 55.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 493/1000
+
+Average weights (dominant group):
+[[ 3.256 -3.426 -4.877  2.776]
+ [ 1.617  5.361 -2.604 -5.093]
+ [-1.661 -0.817  2.228  0.858]]
+Average Bias (dominant group):
+[-0.112 -0.279 -0.213  0.01 ]
+
+============================================================
+Number of A-X pairs: 60.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 2
+Number of posterior samples in this group: 410/1000
+
+Average weights (dominant group):
+[[ 4.244  2.431 -6.61  -2.729]
+ [-0.77  -6.324  0.667  5.753]]
+Average Bias (dominant group):
+[-0.14  -0.114 -0.258 -0.153]
+
+============================================================
+Number of A-X pairs: 0.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 289/1000
+
+Average weights (dominant group):
+[[ 0.253 -8.622 -0.665  2.489]
+ [ 2.864 -7.753 -4.134  1.799]
+ [ 0.136 -3.345 -0.044  0.822]]
+Average Bias (dominant group):
+[-0.212 -1.569 -0.268 -0.082]
+
+============================================================
+Number of A-X pairs: 2.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 4
+Number of posterior samples in this group: 356/1000
+
+Average weights (dominant group):
+[[ 2.069 -6.133 -2.976  2.596]
+ [ 1.384 -4.928 -2.171  1.911]
+ [ 0.42  -2.674 -0.821  1.218]
+ [ 0.384 -1.101 -0.443  0.548]]
+Average Bias (dominant group):
+[-0.126 -0.844 -0.284 -0.075]
+
+============================================================
+Number of A-X pairs: 4.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 335/1000
+
+Average weights (dominant group):
+[[ 2.698 -5.935 -4.289  2.955]
+ [ 0.739 -4.292 -1.344  1.914]
+ [ 0.681 -1.103 -0.882  0.724]]
+Average Bias (dominant group):
+[-0.076 -0.639 -0.381 -0.11 ]
+
+============================================================
+Number of A-X pairs: 6.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 323/1000
+
+Average weights (dominant group):
+[[ 1.804 -4.358 -2.674  2.596]
+ [ 1.786 -2.828 -2.672  1.48 ]
+ [ 0.803 -1.068 -1.292  0.701]]
+Average Bias (dominant group):
+[-0.139 -0.389 -0.325 -0.09 ]
+
+============================================================
+Number of A-X pairs: 8.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 419/1000
+
+Average weights (dominant group):
+[[ 1.91  -3.507 -2.888  2.393]
+ [ 1.628 -2.391 -2.624  1.39 ]
+ [ 0.395 -0.812 -0.674  0.53 ]]
+Average Bias (dominant group):
+[-0.123 -0.299 -0.284 -0.131]
+
+============================================================
+Number of A-X pairs: 10.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 409/1000
+
+Average weights (dominant group):
+[[ 1.563 -2.916 -2.472  2.134]
+ [ 1.721 -2.196 -2.735  1.282]
+ [ 0.314 -0.365 -0.194  0.203]]
+Average Bias (dominant group):
+[-0.172 -0.212 -0.263 -0.183]
+
+============================================================
+Number of A-X pairs: 12.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 426/1000
+
+Average weights (dominant group):
+[[ 2.893 -1.113 -3.938  0.573]
+ [ 0.429 -3.838 -0.963  2.67 ]
+ [ 0.382 -0.312 -0.572  0.347]]
+Average Bias (dominant group):
+[-0.184 -0.203 -0.258 -0.191]
+
+============================================================
+Number of A-X pairs: 14.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 400/1000
+
+Average weights (dominant group):
+[[ 3.229 -0.54  -4.48   0.069]
+ [ 0.277 -4.356 -0.848  3.201]
+ [ 0.234 -0.343 -0.26   0.363]]
+Average Bias (dominant group):
+[-0.171 -0.187 -0.245 -0.195]
+
+============================================================
+Number of A-X pairs: 16.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 2
+Number of posterior samples in this group: 404/1000
+
+Average weights (dominant group):
+[[ 3.669  0.671 -5.465 -0.949]
+ [-0.388 -5.286  0.143  4.148]]
+Average Bias (dominant group):
+[-0.163 -0.188 -0.252 -0.177]
+
+============================================================
+Number of A-X pairs: 18.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 381/1000
+
+Average weights (dominant group):
+[[ 3.458  0.311 -4.831 -0.619]
+ [-0.145 -5.005 -0.207  3.833]
+ [ 0.341 -0.158 -0.476  0.11 ]]
+Average Bias (dominant group):
+[-0.16  -0.212 -0.233 -0.149]
+
+============================================================
+Number of A-X pairs: 20.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 2
+Number of posterior samples in this group: 446/1000
+
+Average weights (dominant group):
+[[ 4.046  1.299 -5.688 -1.495]
+ [-0.677 -5.657  0.477  4.638]]
+Average Bias (dominant group):
+[-0.156 -0.159 -0.222 -0.155]
+
+============================================================
+Number of A-X pairs: 25.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 2
+Number of posterior samples in this group: 539/1000
+
+Average weights (dominant group):
+[[ 4.065  1.565 -5.999 -1.756]
+ [-0.674 -5.893  0.456  4.888]]
+Average Bias (dominant group):
+[-0.172 -0.14  -0.245 -0.177]
+
+============================================================
+Number of A-X pairs: 30.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 385/1000
+
+Average weights (dominant group):
+[[ 4.017  1.778 -5.966 -1.983]
+ [-0.646 -5.788  0.424  5.039]
+ [ 0.15  -0.092 -0.213  0.182]]
+Average Bias (dominant group):
+[-0.167 -0.179 -0.231 -0.162]
+
+============================================================
+Number of A-X pairs: 35.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 2
+Number of posterior samples in this group: 508/1000
+
+Average weights (dominant group):
+[[ 4.082  1.919 -6.007 -2.153]
+ [-0.677 -6.097  0.465  5.25 ]]
+Average Bias (dominant group):
+[-0.15  -0.119 -0.203 -0.172]
+
+============================================================
+Number of A-X pairs: 40.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 2
+Number of posterior samples in this group: 371/1000
+
+Average weights (dominant group):
+[[ 4.068  2.109 -6.145 -2.402]
+ [-0.618 -6.213  0.477  5.5  ]]
+Average Bias (dominant group):
+[-0.155 -0.122 -0.211 -0.181]
+
+============================================================
+Number of A-X pairs: 45.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 3
+Number of posterior samples in this group: 408/1000
+
+Average weights (dominant group):
+[[ 4.162  2.101 -6.383 -2.421]
+ [-0.686 -5.88   0.521  5.312]
+ [ 0.266 -0.193 -0.227  0.208]]
+Average Bias (dominant group):
+[-0.148 -0.107 -0.232 -0.161]
+
+============================================================
+Number of A-X pairs: 50.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 2
+Number of posterior samples in this group: 408/1000
+
+Average weights (dominant group):
+[[ 4.203  2.288 -6.591 -2.575]
+ [-0.74  -6.238  0.548  5.611]]
+Average Bias (dominant group):
+[-0.145 -0.116 -0.23  -0.145]
+
+============================================================
+Number of A-X pairs: 55.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 2
+Number of posterior samples in this group: 416/1000
+
+Average weights (dominant group):
+[[ 4.199  2.336 -6.278 -2.671]
+ [-0.78  -6.256  0.637  5.778]]
+Average Bias (dominant group):
+[-0.141 -0.078 -0.223 -0.131]
+
+============================================================
+Number of A-X pairs: 60.
+
+
+Stimulus vector is (A, X, B, US).------------------------------------------------------------
+Dominant posterior feature count summary
+
+Most frequent number of active features: 2
+Number of posterior samples in this group: 499/1000
+
+Average weights (dominant group):
+[[ 4.141  2.405 -6.694 -2.762]
+ [-0.714 -6.291  0.652  5.799]]
+Average Bias (dominant group):
+[-0.135 -0.099 -0.262 -0.163]
