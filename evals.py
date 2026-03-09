@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from models import ParametricLLFM
 from models import GibbsSamplerLLFM
 
+
+
 def latent_features(threshold=5, Z_post=None, W_post=None, b_post=None):
     """
     Groups posterior samples by number of active features (usage > threshold),
@@ -55,14 +57,14 @@ def latent_features(threshold=5, Z_post=None, W_post=None, b_post=None):
         W_stack = np.array([w for w, _, _ in samples])   # (n_group, k, S)
         b_stack = np.array([b for _, b, _ in samples])   # (n_group, S)
         usage_stack = np.array([u for _, _, u in samples]) # (n_group, k)
-
         W_mean = W_stack.mean(axis=0)
         b_mean = b_stack.mean(axis=0)
         usage_mean = usage_stack.mean(axis=0)
+        usage_mean_prob = usage_mean / T
 
 
-        print("  Average usage per feature (size-biased order):")
-        print(usage_mean)
+        print("  Average usage probability per feature (size-biased order):")
+        print(usage_mean_prob)
         print("  Average weights:")
         print(W_mean)
         print("  Average Bias:")
@@ -221,3 +223,5 @@ def latent_features_dominant_to_file(filename,
         f.write("\n")
 
     return dominant_k
+
+

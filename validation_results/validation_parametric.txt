@@ -1,0 +1,75 @@
+1. T = 500 S = 10 K = 5 alpha = 5 sigma_w = 3.0 mu_b = -3.0 sigma_b = 3.0 runs = 60
+
+=== NMSE ===
+W: mean=1.1161, std=0.4742
+b: mean=0.4355, std=0.3095
+p: mean=0.3464, std=0.3062
+
+=== Correlation ===
+W: mean=0.7341, std=0.0839
+b: mean=0.5984, std=0.2095
+p: mean=0.2731, std=0.4913
+
+
+2. T = 800
+S = 4
+K = 5
+alpha = 1.0
+sigma_w = 1.0
+mu_b = -1.0
+sigma_b = 1.0
+runs = 5
+
+=== NMSE ===
+W: mean=0.6824, std=0.2674
+b: mean=0.3882, std=0.4895
+
+=== Correlation ===
+W: mean=0.8097, std=0.1130
+b: mean=0.8200, std=0.2601
+
+
+3. T = 300
+S = 4
+K = 5
+alpha = 2.5
+sigma_w = 1.0
+mu_b = -3.0
+sigma_b = 1.0
+
+n_iter = 1000
+burn = 500
+n_subsample = 100
+chains =5
+runs = 50
+
+=== NMSE ===
+W: mean=0.3364, std=0.1852
+b: mean=0.4858, std=0.3942
+
+=== Correlation ===
+W: mean=0.8709, std=0.1052
+b: mean=0.6307, std=0.4799
+
+
+4. T = 800
+S = 4
+K = 5
+alpha = 2.5
+sigma_w = 1.0
+mu_b = -3.0
+sigma_b = 1.0
+
+n_iter = 1000
+burn = 500
+n_subsample = 125
+chains =4
+runs = 50
+
+=== NMSE ===
+W: mean=0.3370, std=0.1535
+b: mean=0.5311, std=0.4450
+
+=== Correlation ===
+W: mean=0.8832, std=0.0566
+b: mean=0.6941, std=0.2981

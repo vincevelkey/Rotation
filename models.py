@@ -22,8 +22,8 @@ class ParametricLLFM:
     π : (K,)
     """
 
-    def __init__(self, T, S, K, alpha=0.5, mu_b=-15.0,
-                 sigma_w=3, sigma_b=1.0, fixed_bias=None):
+    def __init__(self, T, S, K, rho, alpha=1, mu_b=[-1.0]*4,
+                 sigma_w=3, sigma_b=1.0):
         """
         Parameters
         ----------
@@ -32,29 +32,23 @@ class ParametricLLFM:
         self.T = T
         self.S = S
         self.K = K
+        self.rho = rho
         self.alpha = alpha
-        self.mu_b = mu_b
+        self.mu_b = np.array(mu_b)
         self.sigma_w = sigma_w
         self.sigma_b = sigma_b
 
         # Beta-Bernoulli prior for latent features
-        self.pi = np.random.beta(alpha / K, 1.0, size=K)
+        self.pi = np.random.beta(self.alpha / K, 1.0, size=K)
         self.Z = np.random.binomial(1, self.pi, size=(T, K))
-        self.W = np.random.normal(0, sigma_w, size=(K, S))
-
-        # Fixed bias option
-        if fixed_bias is not None:
-            assert len(fixed_bias) == S, "fixed_bias must have length S"
-            self.b = np.array(fixed_bias)
-            self.fixed_bias = True
-        else:
-            self.b = np.random.normal(0, sigma_b, size=(S,))
-            self.fixed_bias = False
+        self.W = np.random.normal(0, self.sigma_w, size=(K, S))
+        self.A = np.random.binomial(1, rho, size=(K, S))
+        self.b = np.random.normal(self.mu_b, self.sigma_b, size=S)
 
     # -----------------------------------------------------
 
     def linear_predictor(self):
-        return self.Z @ self.W + self.b  # (T × S)
+        return self.Z @ (self.A * self.W) + self.b  # (T × S)
 
     def sigmoid(self):
         return expit(self.linear_predictor())
@@ -75,21 +69,19 @@ class GibbsSamplerLLFM:
     (π integrated out). Optionally allows fixed bias.
     """
 
-    def __init__(self, Data, K=15, alpha=0.5, sigma_w=3.0, sigma_b=1.0, mu_b=-15.0,
-                 n_iter=1000, burn=200, n_subsample=None, fixed_bias=None):
+    def __init__(self, Data, K=15, rho=0.1, alpha=0.5, sigma_w=3.0, sigma_b=1.0, mu_b=[-1.0]*4,
+                 n_iter=1000, burn=200, n_subsample=None):
         self.Data = Data
         self.T, self.S = Data.shape
         self.K = K
         self.alpha = alpha
+        self.rho = rho
         self.sigma_w = sigma_w
         self.sigma_b = sigma_b
-        self.mu_b = mu_b
-        self.fixed_bias = fixed_bias
-
+        self.mu_b = np.array(mu_b)
         # Base model
-        self.model = ParametricLLFM(self.T, self.S, self.K, self.alpha,
-                                    self.mu_b, self.sigma_w, self.sigma_b,
-                                    fixed_bias=self.fixed_bias)
+        self.model = ParametricLLFM(T=self.T, S=self.S, K=self.K, rho=self.rho, alpha=self.alpha,
+                                    mu_b=self.mu_b, sigma_w=self.sigma_w, sigma_b=self.sigma_b)
 
         # Gibbs sampling parameters
         self.n_iter = n_iter
@@ -100,9 +92,11 @@ class GibbsSamplerLLFM:
         self.samples_W = np.empty((self.n_iter, self.K, self.S))
         self.samples_b = np.empty((self.n_iter, self.S))
         self.samples_Z = np.empty((self.n_iter, self.T, self.K))
+        self.samples_A = np.empty((self.n_iter, self.K, self.S))
         self.good_samples_W = np.empty((self.n_subsample, self.K, self.S))
         self.good_samples_b = np.empty((self.n_subsample, self.S))
         self.good_samples_Z = np.empty((self.n_subsample, self.T, self.K))
+        self.good_samples_A = np.empty((self.n_subsample, self.K, self.S))
 
     # --------------------------------------------------------
     # Main Gibbs loop
@@ -110,8 +104,6 @@ class GibbsSamplerLLFM:
 
     def run(self, verbose=False):
         for it in range(self.n_iter):
-            if verbose:
-                print(f"Iteration {it+1}/{self.n_iter}")
 
             # 1) Sample Polya-Gamma variables
             eta = self.model.linear_predictor()
@@ -120,63 +112,129 @@ class GibbsSamplerLLFM:
             # 2) Sample W
             for s in range(self.S):
                 Z = self.model.Z
-                omega_d = omega[:, s]
+                a = self.model.A[:, s]
+                omega_s = omega[:, s]
+                Z_mask = Z * a
                 kappa = self.Data[:, s] - 0.5
-                Omega = np.diag(omega_d)
-                V_inv = Z.T @ Omega @ Z + np.eye(self.K) / self.sigma_w**2
-                rhs = Z.T @ kappa
+                ZOmega = omega_s[:, None] * Z_mask
+                V_inv = Z_mask.T @ ZOmega + np.eye(self.K) / self.sigma_w**2
+                b_s = self.model.b[s]
+                rhs = Z_mask.T @ (kappa - omega_s * b_s)
                 L = np.linalg.cholesky(V_inv)
                 mu = np.linalg.solve(L.T, np.linalg.solve(L, rhs))
                 noise = np.linalg.solve(L.T, np.random.randn(self.K))
-                self.model.W[:, s] = mu + noise
+                w_new = mu + noise
+                w_new *= a  # zero out entries where a=0
+                self.model.W[:, s] = w_new
 
-            # 3) Sample or fix bias
-            if not self.model.fixed_bias:
+            # 3) Sample b
+            for s in range(self.S):
+                omega_s = omega[:, s]
+                kappa = self.Data[:, s] - 0.5
+                linear_part = self.model.Z @ (self.model.A[:, s] * self.model.W[:, s])
+                V_b = 1.0 / (omega_s.sum() + 1.0 / self.sigma_b**2)
+                m_b = V_b * (np.sum(kappa - omega_s * linear_part) + self.mu_b / self.sigma_b**2)
+                self.model.b[s] = m_b[s] + np.sqrt(V_b) * np.random.randn()
+
+            # 4) Sample A
+
+            for k in range(self.K):
                 for s in range(self.S):
-                    omega_d = omega[:, s]
-                    kappa = self.Data[:, s] - 0.5
-                    linear_part = self.model.Z @ self.model.W[:, s]
-                    V_b = 1.0 / (omega_d.sum() + 1.0 / self.sigma_b**2)
-                    m_b = V_b * (np.sum(kappa - omega_d * linear_part) + self.mu_b / self.sigma_b**2)
-                    self.model.b[s] = m_b + np.sqrt(V_b) * np.random.randn()
-            else:
-                # fixed bias, do nothing (already set in model)
-                pass
+
+                    w = self.model.W[k, s]
+                    z = self.model.Z[:, k]
+
+                    eta = self.model.linear_predictor()
+
+                    # remove contribution
+                    eta_minus = eta[:, s] - z * w
+
+                    # likelihood if A=0
+                    p0 = expit(eta_minus)
+
+                    ll0 = np.sum(
+                        self.Data[:, s] * np.log(p0 + 1e-12) +
+                        (1 - self.Data[:, s]) * np.log(1 - p0 + 1e-12)
+                    )
+
+                    # likelihood if A=1
+                    eta_plus = eta_minus + z * w
+                    p1 = expit(eta_plus)
+
+                    ll1 = np.sum(
+                        self.Data[:, s] * np.log(p1 + 1e-12) +
+                        (1 - self.Data[:, s]) * np.log(1 - p1 + 1e-12)
+                    )
+
+                    logp1 = ll1 + np.log(self.rho + 1e-12)
+                    logp0 = ll0 + np.log(1 - self.rho + 1e-12)
+
+                    prob = 1 / (1 + np.exp(-(logp1 - logp0)))
+
+                    a_new = np.random.binomial(1, prob)
+
+                    self.model.A[k, s] = a_new
+
+                    if a_new == 0:
+                        self.model.W[k, s] = 0.0
 
             # 4) Collapsed Z update
             for t in range(self.T):
-                eta_t = self.model.Z[t] @ self.model.W + self.model.b
+
+                eta_t = self.model.Z[t] @ (self.model.A * self.model.W) + self.model.b
+
                 for k in range(self.K):
+
                     z_old = self.model.Z[t, k]
+
                     m_k = self.model.Z[:, k].sum() - z_old
-                    log_prior_1 = np.log(m_k + self.alpha / self.K + 1e-12)
-                    log_prior_0 = np.log(self.T - m_k + 1e-12)
-                    eta_minus = eta_t - self.model.W[k] if z_old == 1 else eta_t
 
-                    # z = 0
+                    log_prior1 = np.log(m_k + self.alpha / self.K + 1e-12)
+                    log_prior0 = np.log(self.T - m_k + 1e-12)
+
+                    contrib = self.model.A[k] * self.model.W[k]
+
+                    eta_minus = eta_t - contrib if z_old else eta_t
+
+                    # z=0
+                    p0 = expit(eta_minus)
+
                     ll0 = np.sum(
-                        self.Data[t] * np.log(expit(eta_minus)+1e-12) +
-                        (1 - self.Data[t]) * np.log(1 - expit(eta_minus)+1e-12)
-                    )
-                    # z = 1
-                    eta_plus = eta_minus + self.model.W[k]
-                    ll1 = np.sum(
-                        self.Data[t] * np.log(expit(eta_plus)+1e-12) +
-                        (1 - self.Data[t]) * np.log(1 - expit(eta_plus)+1e-12)
+                        self.Data[t] * np.log(p0 + 1e-12) +
+                        (1 - self.Data[t]) * np.log(1 - p0 + 1e-12)
                     )
 
-                    logp0 = ll0 + log_prior_0
-                    logp1 = ll1 + log_prior_1
-                    p1 = 1.0 / (1.0 + np.exp(-(logp1 - logp0)))
-                    z_new = np.random.binomial(1, p1)
+                    # z=1
+                    eta_plus = eta_minus + contrib
+                    p1 = expit(eta_plus)
+
+                    ll1 = np.sum(
+                        self.Data[t] * np.log(p1 + 1e-12) +
+                        (1 - self.Data[t]) * np.log(1 - p1 + 1e-12)
+                    )
+
+                    logp0 = ll0 + log_prior0
+                    logp1 = ll1 + log_prior1
+
+                    prob = 1 / (1 + np.exp(-(logp1 - logp0)))
+
+                    z_new = np.random.binomial(1, prob)
+
                     self.model.Z[t, k] = z_new
+
                     if z_new != z_old:
-                        eta_t = eta_minus + z_new * self.model.W[k]
+                        eta_t = eta_minus + z_new * contrib
+
 
             # Store samples
             self.samples_W[it] = self.model.W
+            self.samples_A[it] = self.model.A
             self.samples_b[it] = self.model.b
             self.samples_Z[it] = self.model.Z
+
+            if verbose and (it+1) % 25 == 0:
+                fro_W = np.linalg.norm(self.model.W, ord='fro')
+                print(f"Iteration {it+1}: ||W||_F = {fro_W:.4f}")
 
     # --------------------------------------------------------
     # Subsample posterior
@@ -194,54 +252,9 @@ class GibbsSamplerLLFM:
         self.good_samples_W = self.samples_W[chosen]
         self.good_samples_b = self.samples_b[chosen]
         self.good_samples_Z = self.samples_Z[chosen]
-        return self.good_samples_W, self.good_samples_b, self.good_samples_Z
+        self.good_samples_A = self.samples_A[chosen]
+        #return self.good_samples_W, self.good_samples_b, self.good_samples_Z
 
-    # --------------------------------------------------------
-    # Posterior predictive (vectorized, last dimension)
-    # --------------------------------------------------------
-    def posterior_predictive_vectorised(self, cond_obs, n_z_samples=50):
-        """
-        Predict P(Y_last | Y_0:S-2 = cond_obs, data)
-        cond_obs: array of shape (S-1,), binary assignment of observed features
-        """
-        samples_W = self.good_samples_W
-        samples_b = self.good_samples_b
-        samples_Z = self.good_samples_Z
-        cond_obs = np.array(cond_obs)
-        N, K, S = samples_W.shape
-        assert len(cond_obs) == S-1, "cond_obs must have length S-1"
-
-        # ----- Sample latent Z for Monte Carlo -----
-        Z_train_counts = samples_Z.sum(axis=1)
-        prior_prob = Z_train_counts / self.T
-        Z_new = np.random.binomial(1, prior_prob[:, None, :], size=(N, n_z_samples, K))
-
-        # ----- Expand W and b -----
-        W_expand = samples_W[:, None, :, :]
-        W_expand = np.repeat(W_expand, n_z_samples, axis=1)
-        b_expand = samples_b[:, None, :]
-        b_expand = np.repeat(b_expand, n_z_samples, axis=1)
-
-        # ----- Full obs: conditioned + prediction -----
-        obs = np.concatenate([cond_obs, [1]])  # last = predict 1
-        indices = list(range(S))
-        eta_all = np.einsum('nzk,nzks->nzs', Z_new, W_expand[:, :, :, indices]) + b_expand[:, :, indices]
-
-        obs_expand = obs[None, None, :]
-        logp_all = obs_expand * np.log(expit(eta_all)+1e-12) + (1-obs_expand) * np.log(1-expit(eta_all)+1e-12)
-        logp_all = np.sum(logp_all, axis=2)
-
-        eta_cond = eta_all[:, :, :S-1]
-        obs_cond = cond_obs[None, None, :]
-        logp_cond = obs_cond * np.log(expit(eta_cond)+1e-12) + (1-obs_cond) * np.log(1-expit(eta_cond)+1e-12)
-        logp_cond = np.sum(logp_cond, axis=2)
-
-        log_num = logsumexp(logp_all, axis=1) - np.log(n_z_samples)
-        log_den = logsumexp(logp_cond, axis=1) - np.log(n_z_samples)
-        log_num_avg = logsumexp(log_num) - np.log(N)
-        log_den_avg = logsumexp(log_den) - np.log(N)
-
-        return np.exp(log_num_avg - log_den_avg)
 
 
     def posterior_predictive(self, cond_obs, n_z_samples=50):
@@ -280,7 +293,6 @@ class GibbsSamplerLLFM:
                     obs_full * np.log(expit(eta_full) + 1e-12) +
                     (1 - obs_full) * np.log(1 - expit(eta_full) + 1e-12)
                 )
-                log_num_list.append(logp_full)
     
                 # ----- Conditioned dimensions only -----
                 eta_cond = eta_full[:S-1]
@@ -288,7 +300,13 @@ class GibbsSamplerLLFM:
                     cond_obs * np.log(expit(eta_cond) + 1e-12) +
                     (1 - cond_obs) * np.log(1 - expit(eta_cond) + 1e-12)
                 )
-                log_den_list.append(logp_cond)
+                log_pz = np.sum(
+                 Z_new * np.log(prior_prob + 1e-12) +
+                (1 - Z_new) * np.log(1 - prior_prob + 1e-12)
+                )
+
+                log_num_list.append(logp_full + log_pz)
+                log_den_list.append(logp_cond + log_pz)
     
         # Convert lists to arrays for logsumexp
         log_num_arr = np.array(log_num_list).reshape(N, n_z_samples)
@@ -307,3 +325,69 @@ class GibbsSamplerLLFM:
         # Return conditional probability
         p_post = np.exp(log_num_avg - log_den_avg)
         return p_post
+    
+
+    def posterior_predictive_gibbs(self, cond_obs, n_z_samples=50, gibbs_steps=5):
+
+        cond_obs = np.array(cond_obs)
+
+        N, K, S = self.good_samples_W.shape
+        probs = []
+
+        for n in range(N):
+
+            W = self.good_samples_W[n]
+            A = self.good_samples_A[n]
+            b = self.good_samples_b[n]
+            Z_post = self.good_samples_Z[n]
+
+            W_eff = A * W
+
+            # empirical prior
+            pi = Z_post.mean(axis=0)
+
+            for _ in range(n_z_samples):
+
+                z = np.random.binomial(1, pi)
+
+                # compute predictor once
+                eta = z @ W_eff + b
+
+                # Gibbs sampling for z | y_cond
+                for _ in range(gibbs_steps):
+
+                    for k in range(K):
+
+                        z_old = z[k]
+                        w = W_eff[k]
+
+                        # remove current contribution
+                        eta_minus = eta - z_old * w
+
+                        # z = 0
+                        p0 = expit(eta_minus[:S-1])
+                        ll0 = np.sum(
+                            cond_obs*np.log(p0+1e-12) +
+                            (1-cond_obs)*np.log(1-p0+1e-12)
+                        ) + np.log(1-pi[k]+1e-12)
+
+                        # z = 1
+                        eta_plus = eta_minus + w
+                        p1 = expit(eta_plus[:S-1])
+                        ll1 = np.sum(
+                            cond_obs*np.log(p1+1e-12) +
+                            (1-cond_obs)*np.log(1-p1+1e-12)
+                        ) + np.log(pi[k]+1e-12)
+
+                        p = 1/(1+np.exp(-(ll1-ll0)))
+
+                        z_new = np.random.binomial(1, p)
+
+                        z[k] = z_new
+
+                        # update eta incrementally
+                        eta = eta_minus + z_new * w
+
+                probs.append(expit(eta[-1]))
+
+        return np.mean(probs)
