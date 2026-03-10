@@ -133,8 +133,8 @@ class GibbsSamplerLLFM:
                 kappa = self.Data[:, s] - 0.5
                 linear_part = self.model.Z @ (self.model.A[:, s] * self.model.W[:, s])
                 V_b = 1.0 / (omega_s.sum() + 1.0 / self.sigma_b**2)
-                m_b = V_b * (np.sum(kappa - omega_s * linear_part) + self.mu_b / self.sigma_b**2)
-                self.model.b[s] = m_b[s] + np.sqrt(V_b) * np.random.randn()
+                m_bs = V_b * (np.sum(kappa - omega_s * linear_part) + self.mu_b[s] / self.sigma_b**2)
+                self.model.b[s] = m_bs + np.sqrt(V_b) * np.random.randn()
 
             # 4) Sample A
 
@@ -253,81 +253,13 @@ class GibbsSamplerLLFM:
         self.good_samples_b = self.samples_b[chosen]
         self.good_samples_Z = self.samples_Z[chosen]
         self.good_samples_A = self.samples_A[chosen]
-        #return self.good_samples_W, self.good_samples_b, self.good_samples_Z
-
-
-
-    def posterior_predictive(self, cond_obs, n_z_samples=50):
-        """
-        Predict P(Y_last=1 | Y_0:S-2 = cond_obs, data)
-        using Monte Carlo over latent Z samples (non-vectorized).
-    
-        cond_obs: array of shape (S-1,), binary assignment of observed features
-        n_z_samples: number of latent draws per posterior sample
-        """
-        cond_obs = np.array(cond_obs)        # (S-1,)
-        N, K, S = self.good_samples_W.shape
-    
-        assert len(cond_obs) == S-1, "cond_obs must have length S-1"
-    
-        log_num_list = []
-        log_den_list = []
-    
-        for n in range(N):  # loop over posterior samples
-            W = self.good_samples_W[n]      # (K, S)
-            b = self.good_samples_b[n]      # (S,)
-            Z_post = self.good_samples_Z[n] # (T, K)
-    
-            # Compute empirical prior for Z
-            Z_counts = Z_post.sum(axis=0)   # (K,)
-            prior_prob = Z_counts / self.T
-    
-            # Monte Carlo over latent draws
-            for mc in range(n_z_samples):
-                Z_new = np.random.binomial(1, prior_prob)  # (K,)
-    
-                # ----- Full observation log-prob (joint) -----
-                eta_full = Z_new @ W + b               # (S,)
-                obs_full = np.concatenate([cond_obs, [1]])  # full obs vector
-                logp_full = np.sum(
-                    obs_full * np.log(expit(eta_full) + 1e-12) +
-                    (1 - obs_full) * np.log(1 - expit(eta_full) + 1e-12)
-                )
-    
-                # ----- Conditioned dimensions only -----
-                eta_cond = eta_full[:S-1]
-                logp_cond = np.sum(
-                    cond_obs * np.log(expit(eta_cond) + 1e-12) +
-                    (1 - cond_obs) * np.log(1 - expit(eta_cond) + 1e-12)
-                )
-                log_pz = np.sum(
-                 Z_new * np.log(prior_prob + 1e-12) +
-                (1 - Z_new) * np.log(1 - prior_prob + 1e-12)
-                )
-
-                log_num_list.append(logp_full + log_pz)
-                log_den_list.append(logp_cond + log_pz)
-    
-        # Convert lists to arrays for logsumexp
-        log_num_arr = np.array(log_num_list).reshape(N, n_z_samples)
-        log_den_arr = np.array(log_den_list).reshape(N, n_z_samples)
-    
-        # Monte Carlo estimate in log-space
-        log_num = logsumexp(log_num_arr, axis=1) - np.log(n_z_samples)  # average over latent draws
-        log_den = logsumexp(log_den_arr, axis=1) - np.log(n_z_samples)
-    
-        # Average over posterior samples
-        log_num_avg = logsumexp(log_num)
-        log_den_avg = logsumexp(log_den)
-        print(f'log_numerator: {log_num_avg}')
-        print(f'log_denom: {log_den_avg}')
-    
-        # Return conditional probability
-        p_post = np.exp(log_num_avg - log_den_avg)
-        return p_post
+        #return self.good_samples_W, self.good_samples_b, self.good_samples_Z, self.good_samples_A
     
 
-    def posterior_predictive_gibbs(self, cond_obs, n_z_samples=50, gibbs_steps=5):
+    def posterior_predictive_gibbs(self, cond_obs,
+                               n_z_samples=50,
+                               burn_z=20,
+                               gibbs_steps=1):
 
         cond_obs = np.array(cond_obs)
 
@@ -343,51 +275,46 @@ class GibbsSamplerLLFM:
 
             W_eff = A * W
 
-            # empirical prior
-            pi = Z_post.mean(axis=0)
+            m = Z_post.sum(axis=0)
+            pi = (m + self.alpha/self.K) / (self.T + 1 + self.alpha/self.K)
 
-            for _ in range(n_z_samples):
+            # initialize once
+            z = np.random.binomial(1, pi)
+            eta = z @ W_eff + b
 
-                z = np.random.binomial(1, pi)
+            total_steps = burn_z + n_z_samples
 
-                # compute predictor once
-                eta = z @ W_eff + b
+            for step in range(total_steps):
 
-                # Gibbs sampling for z | y_cond
-                for _ in range(gibbs_steps):
+                for k in range(K):
 
-                    for k in range(K):
+                    z_old = z[k]
+                    w = W_eff[k]
 
-                        z_old = z[k]
-                        w = W_eff[k]
+                    eta_minus = eta - z_old*w
 
-                        # remove current contribution
-                        eta_minus = eta - z_old * w
+                    p0 = expit(eta_minus[:S-1])
+                    ll0 = np.sum(
+                        cond_obs*np.log(p0+1e-12) +
+                        (1-cond_obs)*np.log(1-p0+1e-12)
+                    ) + np.log(1-pi[k]+1e-12)
 
-                        # z = 0
-                        p0 = expit(eta_minus[:S-1])
-                        ll0 = np.sum(
-                            cond_obs*np.log(p0+1e-12) +
-                            (1-cond_obs)*np.log(1-p0+1e-12)
-                        ) + np.log(1-pi[k]+1e-12)
+                    eta_plus = eta_minus + w
+                    p1 = expit(eta_plus[:S-1])
+                    ll1 = np.sum(
+                        cond_obs*np.log(p1+1e-12) +
+                        (1-cond_obs)*np.log(1-p1+1e-12)
+                    ) + np.log(pi[k]+1e-12)
 
-                        # z = 1
-                        eta_plus = eta_minus + w
-                        p1 = expit(eta_plus[:S-1])
-                        ll1 = np.sum(
-                            cond_obs*np.log(p1+1e-12) +
-                            (1-cond_obs)*np.log(1-p1+1e-12)
-                        ) + np.log(pi[k]+1e-12)
+                    p = 1/(1+np.exp(-(ll1-ll0)))
 
-                        p = 1/(1+np.exp(-(ll1-ll0)))
+                    z_new = np.random.binomial(1,p)
+                    z[k] = z_new
 
-                        z_new = np.random.binomial(1, p)
+                    eta = eta_minus + z_new*w
 
-                        z[k] = z_new
-
-                        # update eta incrementally
-                        eta = eta_minus + z_new * w
-
-                probs.append(expit(eta[-1]))
+                # collect samples after burn-in
+                if step >= burn_z:
+                    probs.append(expit(eta[-1]))
 
         return np.mean(probs)

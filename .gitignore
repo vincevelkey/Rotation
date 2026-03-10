@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Generated experiment outputs
+second-order_conditioning_experiment/outputs/
+validation_results/outputs/
+*.png
+*.txt
