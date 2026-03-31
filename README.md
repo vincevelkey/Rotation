@@ -1,8 +1,8 @@
 # rotation
 
-Research code for latent-feature models of classical conditioning, including
+Code for latent-feature models of classical conditioning, including
 static Gibbs samplers, dynamic particle-filter experiments, and a
-paper-oriented reimplementation of Courville et al. (2003).
+reimplementation of Courville et al. (2003).
 
 ## Repository layout
 
@@ -25,8 +25,3 @@ ignored.
 The code uses Python with `numpy`, `scipy`, and `polyagamma`. The notebooks and
 analysis workflows may also use `matplotlib`, `pandas`, and `scikit-learn`.
 
-## Current status
-
-This repository is organized as an active research workspace. Core model logic
-now lives in the package subdirectories, while top-level modules remain as
-lightweight import shims for older notebooks and scripts.
