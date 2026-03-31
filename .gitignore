@@ -1,9 +1,13 @@
+.DS_Store
 __pycache__/
-*.pyc
+*.py[cod]
 .ipynb_checkpoints/
 
 # Generated experiment outputs
-second-order_conditioning_experiment/outputs/
-validation_results/outputs/
+**/outputs/
+**/outputs_updated/
 *.png
 *.txt
+
+# Local scratch work
+trash/

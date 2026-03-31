@@ -1,9 +1,5 @@
-"""Compatibility exports for legacy top-level imports.
-
-Primary implementations live in ``static.models``.
-"""
-
-from static.models import (
+from .data import generate_data_li_ov, generate_data_second_order, generate_parametric
+from .models import (
     GibbsSamplerLLFM,
     GibbsSamplerLLFMGeometricMask,
     ParametricLLFM,
@@ -17,4 +13,7 @@ __all__ = [
     "ParametricLLFM",
     "ParametricLLFMGeometricMask",
     "_geometric_mask_log_prob",
+    "generate_data_li_ov",
+    "generate_data_second_order",
+    "generate_parametric",
 ]
