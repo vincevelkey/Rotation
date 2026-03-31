@@ -40,7 +40,7 @@ From the repository root:
 python3 -m reimplement.courville_sbn --ax-trials 4 --iterations 4000 --burn-in 1000 --thin 10
 ```
 
-For the full paper-style experiment, open the notebook in
+For the full experiment, open the notebook in
 `reimplement/second_order_conditioning_experiment/` and run all cells. The notebook
 produces the posterior predictive curves for `P(US|A,D)`, `P(US|X,D)`, `P(US|B,D)`,
 `P(US|X,B,D)`, and the posterior mean number of latent causes across the A-X sweep.

@@ -17,8 +17,7 @@ reimplementation of Courville et al. (2003).
 - `report/`: bibliography and report assets.
 
 Generated experiment artifacts live under nested `outputs/` directories and are
-ignored by default. Local scratch notebooks belong in `trash/`, which is also
-ignored.
+ignored by default.
 
 ## Dependencies
 
